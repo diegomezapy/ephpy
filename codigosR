@@ -1,1 +1,236 @@
+---
+title: "Primer práctica de R para Big Data"
+author: "Diego Meza"
+date: "2023-08-12"
+output:
+  html_document: default
+  pdf_document: default
+  word_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Tutoría sincrónica 12 de Agosto del 2023
+## Operaciones básicas con R
+
+```{r}
+x<-c(1:1000)
+y=x^2
+```
+
+
+
+```{r}
+# generamos estadisticas descriptivas para las variables
+summary(x)
+summary(y)
+
+```
+
+
+
+## Gráficas básicas
+
+
+```{r}
+plot(y,x)
+```
+
+## Data frame
+
+
+# cuadros de datos (data.frame)
+
+
+```{r}
+datos=data.frame(x,y)
+head(datos)
+```
+
+```{r}
+plot(datos)
+```
+
+## Generación de números aleatorios
+
+```{r}
+#10 números aleatorio contínuos entre 1 y5
+runif(10,1,5)
+```
+
+```{r}
+#10 números aleatorio enteros entre 1 y5
+floor(runif(10,1,5))
+```
+
+
+```{r}
+#10 números aleatorio con un decimal entre 1 y5
+round(runif(10,1,5),2)
+```
+
+```{r}
+pesos=rnorm(10000,100,2)
+hist(pesos,breaks=500)
+```
+
+## Carga de bases de datos de la EPH 2022 en r
+levantar la base de datos de le Encuesta de Hogares a partir de la página web del INE,
+www.ine.gog.py
+
+```{r}
+#install.packages("readxl")
+library(readxl)
+```
+
+```{r}
+#Descargar y guardado de las bases EPH años 2022 y 2012
+#eph2022=read.csv("https://www.ine.gov.py/datos/encuestas/eph/Poblacion/EPH-2022/data/REG02_EPHC2022.csv", sep=";")
+#write.csv(eph2022,"D:/OneDrive/FACEN_BIGDATA/eph22.csv")
+
+eph2022=read.csv("D:/OneDrive/FACEN_BIGDATA/eph22.csv", sep=",")
+```
+
+
+```{r}
+#eph2012=read.csv("https://www.ine.gov.py/datos/encuestas/eph/Poblacion/EPH-2012/data/cfa40r02_eph2012.csv", sep=";")
+
+#write.csv(eph2012,"D:/OneDrive/FACEN_BIGDATA/eph12.csv")
+
+eph2012=read.csv("D:/OneDrive/FACEN_BIGDATA/eph12.csv", sep=",")
+```
+
+```{r}
+names(eph2012)
+```
+
+
+### Exploramos algunas de las variables
+
+#### Sexo (P06)
+
+```{r}
+table(eph2022$P06)
+```
+```{r}
+eph2022$P06<-factor(eph2022$P06,labels=c("Hombres","Mujeres"))
+table(eph2022$P06)
+eph2012$P06<-factor(eph2012$P06,labels=c("Hombres","Mujeres"))
+table(eph2012$P06)
+```
+
+```{r}
+barplot(table(eph2022$P06))
+barplot(table(eph2012$P06))
+```
+
+
+```{r}
+pie(table(eph2022$P06))
+```
+#### Edad (P02)
+
+```{r}
+table(eph2022$P02)
+```
+
+
+```{r}
+hist(eph2022$P02,col = "pink",main = paste("Histogram of edad 2022"),labels = T)
+hist(eph2012$P02,col = "pink",main = paste("Histogram of edad 2012"),labels = T)
+```
+### Agrupaciones
+
+```{r}
+#resultados poblacionales
+edadysexo2012=aggregate.data.frame(x = eph2012$fexajustado, by = list(eph2012$P06, eph2012$P02), FUN = "sum")
+edadysexo2012$year=2012
+colnames(edadysexo2012) <- c("Sexo", "Edad","Cantidad","Year")
+
+edadysexo2012
+```
+
+
+
+```{r}
+#resultados poblacionales
+edadysexo2022=aggregate.data.frame(x = eph2022$FEX, by = list(eph2022$P06, eph2022$P02), FUN = "sum")
+edadysexo2022$year=2022
+colnames(edadysexo2022) <- c("Sexo", "Edad","Cantidad","Year")
+
+
+edadysexo2022
+```
+
+
+```{r}
+eph12y22=rbind(edadysexo2012,edadysexo2022)
+eph12y22
+```
+
+
+```{r}
+library(ggplot2)
+
+
+ggplot(eph12y22, aes(x = Edad, y = Cantidad, fill = Sexo)) +
+  geom_bar(stat = "identity") +
+  scale_fill_hue(labels = c("HOMBRES", "Mujres")) +
+   facet_grid(. ~ Year)
+
+
+```
+
+```{r}
+tablaedades=aggregate.data.frame(x = eph12y22$Cantidad, by = list(eph12y22$Sexo, eph12y22$Year), FUN = "sum")
+colnames(tablaedades) <- c("Sexo", "Year","Cantidad")
+tablaedades
+
+```
+
+
+
+# Clase 3
+
+## Seleccionamos solo algunas de las variables de las bases para los años 2013 al 2022, para armar series de indicadores
+### Año 2012
+```{r}
+# descargar y guardar las bases en formato csv
+
+
+#eph2012=read.csv("https://www.ine.gov.py/datos/encuestas/eph/Poblacion/EPH-2012/data/cfa40r02_eph2012.csv", sep=";")
+
+#write.csv(eph2012,"D:/OneDrive/FACEN_BIGDATA/eph12.csv")
+
+eph2012=read.csv("D:/OneDrive/FACEN_BIGDATA/eph12.csv", sep=",")
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
